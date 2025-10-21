@@ -1,5 +1,5 @@
-import User from "../models/user.js";
 import jwt from "jsonwebtoken";
+import User from "../models/user.js";
 import { SECRET } from "../util/config.js";
 
 export const errorHandler = (err, _req, res, _next) => {
@@ -20,6 +20,7 @@ export const requireToken = async (req, res, next) => {
 	if (authorization?.toLowerCase().startsWith("bearer ")) {
 		try {
 			console.log(authorization.substring(7));
+
 			req.decodedToken = jwt.verify(authorization.substring(7), SECRET);
 			req.user = await User.findOne({ username: req.decodedToken });
 		} catch (error) {

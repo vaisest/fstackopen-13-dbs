@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Blog, User } from "../models/index.js";
 import { errorHandler, requireToken } from "./middleware.js";
+import { Op } from "sequelize";
 
 const blogRouter = Router();
 // require a blog by middleware
@@ -15,14 +16,35 @@ const blogFinder = async (req, res, next) => {
 		next();
 	}
 };
-blogRouter.get("/", async (_req, res) => {
-	const blogs = await Blog.findAll({
+blogRouter.get("/", async (req, res) => {
+	const searchTerm = req.query.search;
+	// const searchTerm = "react";
+	const query = {
 		attributes: { exclude: ["user_id"] },
 		include: {
 			model: User,
 			attributes: ["name"],
 		},
-	});
+		order: [["likes", "DESC"]],
+	};
+	if (searchTerm) {
+		// case insensitive match in either titler or author
+		query.where = {
+			[Op.or]: [
+				{
+					title: {
+						[Op.iLike]: `%${searchTerm}%`,
+					},
+				},
+				{
+					author: {
+						[Op.iLike]: `%${searchTerm}%`,
+					},
+				},
+			],
+		};
+	}
+	const blogs = await Blog.findAll(query);
 	res.json(blogs);
 });
 

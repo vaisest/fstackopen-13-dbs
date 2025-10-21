@@ -1,12 +1,17 @@
 import { Router } from "express";
-import User from "../models/user.js";
-import errorHandler from "./errorHandler.js";
+import { Blog, User } from "../models/index.js";
+import { errorHandler } from "./middleware.js";
 
 const userRouter = Router();
 // require a blog by middleware
 
 userRouter.get("/", async (_req, res) => {
-	const blogs = await User.findAll();
+	const blogs = await User.findAll({
+		include: {
+			model: Blog,
+			attributes: { exclude: ["user_id"] },
+		},
+	});
 	res.json(blogs);
 });
 

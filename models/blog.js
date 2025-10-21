@@ -19,6 +19,10 @@ const Blog = sequelize.define(
 			type: DataTypes.INTEGER,
 			defaultValue: 0,
 		},
+		user_id: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+		},
 	},
 	{ underscored: true, timestamps: false },
 );

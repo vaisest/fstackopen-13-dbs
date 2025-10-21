@@ -1,6 +1,6 @@
 import { Router } from "express";
-import Blog from "../models/blog.js";
-import errorHandler from "./errorHandler.js";
+import { Blog, User } from "../models/index.js";
+import { errorHandler, requireToken } from "./middleware.js";
 
 const blogRouter = Router();
 // require a blog by middleware
@@ -16,16 +16,27 @@ const blogFinder = async (req, res, next) => {
 	}
 };
 blogRouter.get("/", async (_req, res) => {
-	const blogs = await Blog.findAll();
+	const blogs = await Blog.findAll({
+		attributes: { exclude: ["user_id"] },
+		include: {
+			model: User,
+			attributes: ["name"],
+		},
+	});
 	res.json(blogs);
 });
 
-blogRouter.post("/", async (req, res) => {
-	const blog = await Blog.create(req.body);
+blogRouter.post("/", requireToken, async (req, res) => {
+	const blog = await Blog.create({ ...req.body, user_id: req.user.id });
 	res.json(blog);
 });
 
-blogRouter.delete("/:id", blogFinder, async (req, res) => {
+blogRouter.delete("/:id", blogFinder, requireToken, async (req, res) => {
+	if (req.blog.user_id !== req.user.id) {
+		return res
+			.status(403)
+			.json({ error: "You are not authorized to access this" });
+	}
 	await req.blog.destroy();
 	res.json(req.blog);
 });

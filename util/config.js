@@ -5,3 +5,4 @@ if (process.env.DATABASE_URL === undefined) {
 }
 export const { DATABASE_URL } = process.env;
 export const PORT = process.env.PORT || 3001;
+export const SECRET = process.env.SECRET || "INSECURE SECRET";

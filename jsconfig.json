@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "module": "nodenext",
+        "moduleResolution": "nodenext", // <- Necessary to get imports with .js
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

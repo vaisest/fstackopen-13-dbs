@@ -1,30 +1,41 @@
 import { Router } from "express";
 import Blog from "../models/blog.js";
+import errorHandler from "./errorHandler.js";
 
 const blogRouter = Router();
+// require a blog by middleware
+const blogFinder = async (req, res, next) => {
+	req.blog = await Blog.findByPk(req.params.id);
+	// fail early so that the route doesnt run
+	if (!req.blog) {
+		res
+			.status(404)
+			.json({ error: `Blog with id '${req.params.id}' does not exist` });
+	} else {
+		next();
+	}
+};
 blogRouter.get("/", async (_req, res) => {
-	const notes = await Blog.findAll();
-	res.json(notes);
+	const blogs = await Blog.findAll();
+	res.json(blogs);
 });
 
 blogRouter.post("/", async (req, res) => {
-	try {
-		console.log(req.body);
-		const blog = await Blog.create(req.body);
-		res.json(blog);
-	} catch (error) {
-		res.status(400).json({ error });
-	}
-});
-
-blogRouter.delete("/:id", async (req, res) => {
-	console.log(req.params.id);
-	const blog = await Blog.findByPk(req.params.id);
-	if (blog === null) {
-		return res.status(404);
-	}
-	await blog.destroy();
+	const blog = await Blog.create(req.body);
 	res.json(blog);
 });
+
+blogRouter.delete("/:id", blogFinder, async (req, res) => {
+	await req.blog.destroy();
+	res.json(req.blog);
+});
+
+blogRouter.put("/:id", blogFinder, async (req, res) => {
+	req.blog.likes = req.body.likes;
+	await req.blog.save();
+	res.json(req.blog);
+});
+
+blogRouter.use(errorHandler);
 
 export default blogRouter;

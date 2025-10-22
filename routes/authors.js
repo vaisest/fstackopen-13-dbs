@@ -1,11 +1,11 @@
 import { Router } from "express";
+import { col, fn } from "sequelize";
 import { Blog } from "../models/index.js";
 import { errorHandler } from "./middleware.js";
-import { col, fn } from "sequelize";
 
 const authorRouter = Router();
 
-authorRouter.get("/", async (req, res) => {
+authorRouter.get("/", async (_req, res) => {
 	const authors = await Blog.findAll({
 		attributes: [
 			"author",

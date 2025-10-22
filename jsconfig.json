@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        // "checkJs": true,
         "module": "nodenext",
         "moduleResolution": "nodenext", // <- Necessary to get imports with .js
     },

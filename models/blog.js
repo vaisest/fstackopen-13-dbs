@@ -23,10 +23,12 @@ const Blog = sequelize.define(
 			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
+		year: {
+			type: DataTypes.INTEGER,
+			validate: { min: 1991, max: new Date().getFullYear() },
+		},
 	},
-	{ underscored: true, timestamps: false },
+	{ underscored: true },
 );
-
-Blog.sync();
 
 export default Blog;

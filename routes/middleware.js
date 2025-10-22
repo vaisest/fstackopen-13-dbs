@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import { SECRET } from "../util/config.js";
 
+/** @import {ErrorHandler} from "express" */
+/** @type {ErrorHandler} */
 export const errorHandler = (err, _req, res, _next) => {
 	if (err.name === "SequelizeValidationError") {
 		const errorMessages = err.errors.map((it) => it.message);
@@ -15,6 +17,8 @@ export const errorHandler = (err, _req, res, _next) => {
 	res.status(500).json({ error: err.message });
 };
 
+/** @import {RequestHandler} from "express" */
+/** @type {RequestHandler} */
 export const requireToken = async (req, res, next) => {
 	const authorization = req.get("authorization");
 	if (authorization?.toLowerCase().startsWith("bearer ")) {

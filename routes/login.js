@@ -1,6 +1,6 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
-import { User } from "../models/index.js";
+import { Session, User } from "../models/index.js";
 import { SECRET } from "../util/config.js";
 import { errorHandler } from "./middleware.js";
 
@@ -12,8 +12,12 @@ loginRouter.post("/", async (req, res) => {
 	if (!(passwordCorrect && user)) {
 		return res.status(401).json({ error: "Invalid username or password" });
 	}
+	if (user.disabled) {
+		return res.status(401).json({ error: "Your account has been disabled" });
+	}
 
 	const token = jwt.sign(user.username, SECRET);
+	await Session.create({ userId: user.id, jwt: token });
 
 	res.json({ token, user });
 });

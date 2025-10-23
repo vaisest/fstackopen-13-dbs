@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import { SECRET } from "../util/config.js";
+import Session from "../models/session.js";
 
 /** @import {ErrorHandler} from "express" */
 /** @type {ErrorHandler} */
@@ -24,10 +25,16 @@ export const requireToken = async (req, res, next) => {
 	const authorization = req.get("authorization");
 	if (authorization?.toLowerCase().startsWith("bearer ")) {
 		try {
-			console.log(authorization.substring(7));
-
-			req.decodedToken = jwt.verify(authorization.substring(7), SECRET);
+			req.encodedToken = authorization.substring(7);
+			req.decodedToken = jwt.verify(req.encodedToken, SECRET);
 			req.user = await User.findOne({ username: req.decodedToken });
+			const sessionExists = await Session.findOne({ userId: req.user.id, jwt });
+			// if there is no entry in the db, the token has been revoked
+			if (!sessionExists) {
+				return res
+					.status(401)
+					.json({ error: "Your token has been revoked or has expired" });
+			}
 		} catch (error) {
 			console.log(error);
 			return res.status(401).json({ error: "Token invalid" });

@@ -17,6 +17,11 @@ const User = sequelize.define(
 				isEmail: true,
 			},
 		},
+		disabled: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false,
+		},
 	},
 	{ underscored: true },
 );

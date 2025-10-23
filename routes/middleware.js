@@ -14,7 +14,8 @@ export const errorHandler = (err, _req, res, _next) => {
 	if (err.name === "SequelizeDatabaseError") {
 		return res.status(400).json({ error: `Database error: ${err.message}` });
 	}
-	res.status(500).json({ error: err.message });
+	console.error(err);
+	res.sendStatus(500);
 };
 
 /** @import {RequestHandler} from "express" */

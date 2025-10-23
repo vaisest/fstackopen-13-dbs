@@ -4,6 +4,7 @@ import { Blog, User } from "./models/index.js";
 import authorRouter from "./routes/authors.js";
 import blogRouter from "./routes/blogs.js";
 import loginRouter from "./routes/login.js";
+import readinglistRouter from "./routes/readinglists.js";
 import userRouter from "./routes/users.js";
 import { PORT } from "./util/config.js";
 
@@ -51,6 +52,7 @@ app.use("/api/blogs/", blogRouter);
 app.use("/api/users/", userRouter);
 app.use("/api/login/", loginRouter);
 app.use("/api/authors/", authorRouter);
+app.use("/api/readinglists/", readinglistRouter);
 
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);

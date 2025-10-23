@@ -1,17 +1,40 @@
 import { Router } from "express";
 import { Blog, User } from "../models/index.js";
 import { errorHandler } from "./middleware.js";
+import { Op, Sequelize } from "sequelize";
 
 const userRouter = Router();
-// require a blog by middleware
 
 userRouter.get("/", async (_req, res) => {
 	const blogs = await User.findAll({
 		include: {
 			model: Blog,
-			attributes: { exclude: ["user_id"] },
+			attributes: { exclude: ["user_id", "userId"] },
 		},
 	});
+	res.json(blogs);
+});
+
+userRouter.get("/:id", async (req, res) => {
+	const readFilter = req.query.read;
+
+	/** @type  Parameters<typeof User.findByPk>[1] */
+	const ops = {
+		include: {
+			association: "readings",
+			attributes: { exclude: ["user_id", "readinglist"] },
+		},
+	};
+	if (readFilter) {
+		ops.include.where = {
+			read: Sequelize.where(
+				Sequelize.col("readings.readinglist.read"),
+				Op.eq,
+				readFilter === "true",
+			),
+		};
+	}
+	const blogs = await User.findByPk(req.params.id, ops);
 	res.json(blogs);
 });
 
